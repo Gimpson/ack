@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 78;
+use Test::More tests => 86;
 
 use lib 't';
 use Util qw( sets_match );
@@ -55,7 +55,7 @@ my $perl = [qw(
     t/swamp/perl.pod
 )];
 
-my $extensionless = [qw(
+my $regextype = [qw(
     t/swamp/fooooo
     t/swamp/baaaar
     t/swamp/bar
@@ -73,6 +73,8 @@ my $cc_hh = [ @{$cc}, @{$hh} ];
 my $foo_bar = [ @{$foo}, @{$bar} ];
 my $foo_xml = [ @{$foo}, @{$xml} ];
 my $foo_bar_xml = [ @{$foo}, @{$bar}, @{$xml} ];
+my $regextype_perl = [ @{$regextype}, @{$perl} ];
+my $regextype_foo_perl = [ @{$regextype}, @{$foo}, @{$perl} ];
 
 check_with( '--perl', $perl );
 check_with( '--perl --noruby', $perl );
@@ -112,11 +114,23 @@ check_with( '--type-add xml=.foo --xml', $foo_xml );
 check_with( '--type-add xml=.foo,.bar --xml', $foo_bar_xml );
 
 # check --type-set-regex
-check_with( '--type-set-regex foobar-type=^(fo*o|ba+r)$ --type=foobar-type', $extensionless); 
-check_with( '--type-set-regex foobar-type=^(fo*o|ba+r)$ --foobar-type', $extensionless); 
+check_with( '--type-set-regex foobar-type=^(fo*o|ba+r)$ --type=foobar-type', $regextype); 
+check_with( '--type-set-regex foobar-type=^(fo*o|ba+r)$ --foobar-type', $regextype); 
 
 # check that --type-set redefines
 check_with( '--type-set cc=.foo --cc', $foo );
+
+# check that --type-set-regex redefines
+check_with( '--type-set-regex cc=^(fo*o|ba+r)$ --cc', $regextype);
+
+# check --type-add-regex
+check_with( '--type-add-regex perl=^(fo*o|ba+r)$ --perl', $regextype_perl);
+
+# check --type-add-regex with --type-add
+check_with( '--type-add perl=.foo --type-add-regex perl=^(fo*o|ba+r)$ --perl', $regextype_foo_perl);
+
+# check multiple --type-add-regex
+check_with( '--type-add-regex perl=^fo*o$ --type-add-regex perl=^ba+r$ --perl', $regextype_perl);
 
 # check that builtin types cannot be changed
 BUILTIN: {
