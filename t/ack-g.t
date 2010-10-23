@@ -206,6 +206,8 @@ ALL_AND_DASH_G_INTERACTION: {
     my @expected = qw(
         t/swamp/file.bar
         t/swamp/file.foo
+        t/swamp/bar
+        t/swamp/fooooo
     );
     my $content_regex = 'file';
     my $file_regex = 'swamp.*[fb][oa][or]';

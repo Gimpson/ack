@@ -61,6 +61,10 @@ ACK_F_TEXT: {
         t/swamp/perl.pod
         t/swamp/Rakefile
         t/swamp/sample.rake
+        t/swamp/fo
+        t/swamp/fooooo
+        t/swamp/bar
+        t/swamp/baaaar
         t/text/4th-of-july.txt
         t/text/boy-named-sue.txt
         t/text/freedom-of-choice.txt

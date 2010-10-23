@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 74;
+use Test::More tests => 78;
 
 use lib 't';
 use Util qw( sets_match );
@@ -55,6 +55,13 @@ my $perl = [qw(
     t/swamp/perl.pod
 )];
 
+my $extensionless = [qw(
+    t/swamp/fooooo
+    t/swamp/baaaar
+    t/swamp/bar
+    t/swamp/fo
+)];
+
 my $skipped = [
     't/etc/core.2112',
     't/swamp/#emacs-workfile.pl#',
@@ -103,6 +110,10 @@ check_with( '--type-set foo-type=.foo --type-set bar-type=.bar --foo-type --bar-
 # check --type-add
 check_with( '--type-add xml=.foo --xml', $foo_xml );
 check_with( '--type-add xml=.foo,.bar --xml', $foo_bar_xml );
+
+# check --type-set-regex
+check_with( '--type-set-regex foobar-type=^(fo*o|ba+r)$ --type=foobar-type', $extensionless); 
+check_with( '--type-set-regex foobar-type=^(fo*o|ba+r)$ --foobar-type', $extensionless); 
 
 # check that --type-set redefines
 check_with( '--type-set cc=.foo --cc', $foo );

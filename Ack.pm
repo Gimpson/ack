@@ -32,6 +32,7 @@ BEGIN {
 
 
 our %types;
+our @regex_types;
 our %type_wanted;
 our %mappings;
 our %ignore_dirs;
@@ -372,8 +373,9 @@ sub get_command_line_options {
 =head2 def_types_from_ARGV
 
 Go through the command line arguments and look for
-I<--type-set foo=.foo,.bar> and I<--type-add xml=.rdf>.
-Remove them from @ARGV and add them to the supported filetypes,
+I<--type-set foo=.foo,.bar>,  and I<--type-add xml=.rdf>
+(and their regex counterparts).  Remove them from @ARGV and 
+add them to the supported filetypes,
 i.e. into %mappings, etc.
 
 =cut
@@ -386,14 +388,16 @@ sub def_types_from_ARGV {
         # no_auto_abbrev => otherwise -c is expanded and not left alone
     $parser->configure( 'no_ignore_case', 'pass_through', 'no_auto_abbrev' );
     $parser->getoptions(
-        'type-set=s' => sub { shift; push @typedef, ['c', shift] },
-        'type-add=s' => sub { shift; push @typedef, ['a', shift] },
+        'type-set=s'       => sub { shift; push @typedef, ['c', shift] },
+        'type-add=s'       => sub { shift; push @typedef, ['a', shift] },
+        'type-set-regex=s' => sub { shift; push @typedef, ['cr', shift] },
+        'type-add-regex=s' => sub { shift; push @typedef, ['ar', shift] },
     ) or App::Ack::die( 'See ack --help or ack --man for options.' );
 
     for my $td (@typedef) {
         my ($type, $ext) = split /=/, $td->[1];
 
-        if ( $td->[0] eq 'c' ) {
+        if ( $td->[0] eq 'c' || $td->[0] eq 'cr'  ) {
             # type-set
             if ( exists $mappings{$type} ) {
                 # can't redefine types 'make', 'skipped', 'text' and 'binary'
@@ -403,7 +407,7 @@ sub def_types_from_ARGV {
                 delete_type($type);
             }
         }
-        else {
+        elsif ( $td->[0] eq 'a' || $td->[0] eq 'ar' ) {
             # type-add
 
             # can't append to types 'make', 'skipped', 'text' and 'binary'
@@ -414,18 +418,26 @@ sub def_types_from_ARGV {
                 unless exists $mappings{$type};
         }
 
-        my @exts = split /,/, $ext;
-        s/^\.// for @exts;
-
-        if ( !exists $mappings{$type} || ref($mappings{$type}) eq 'ARRAY' ) {
-            push @{$mappings{$type}}, @exts;
-            for my $e ( @exts ) {
-                push @{$types{$e}}, $type;
-            }
+        if ( $td->[0] =~ /r$/ ) {
+            $ext = build_regex($ext);
+            check_regex($ext);
+            push @regex_types, { regex => qr/$ext/, type => $type };
         }
         else {
-            App::Ack::die( qq{Cannot append to type "$type".} );
+            my @exts = split /,/, $ext;
+            s/^\.// for @exts;
+
+            if ( !exists $mappings{$type} || ref($mappings{$type}) eq 'ARRAY' ) {
+                push @{$mappings{$type}}, @exts;
+                for my $e ( @exts ) {
+                    push @{$types{$e}}, $type;
+                }
+            }
+            else {
+                App::Ack::die( qq{Cannot append to type "$type".} );
+            }
         }
+
     }
 
     return;
@@ -449,6 +461,7 @@ sub delete_type {
     for my $ext ( keys %types ) {
         $types{$ext} = [ grep { $_ ne $type } @{$types{$ext}} ];
     }
+    @regex_types = grep { $_->{type} ne $type } @regex_types;
 }
 
 =head2 ignoredir_filter
@@ -503,11 +516,22 @@ sub filetypes {
     return ('make',TEXT)        if $lc_basename eq 'makefile' || $lc_basename eq 'gnumakefile';
     return ('rake','ruby',TEXT) if $lc_basename eq 'rakefile';
 
+    my %matched_types;
     # If there's an extension, look it up
     if ( $filename =~ m{\.([^\.$dir_sep_chars]+)$}o ) {
         my $ref = $types{lc $1};
-        return (@{$ref},TEXT) if $ref;
+        map { $matched_types{$_} = 1; } @{$ref} if $ref;
     }
+
+    # Try any regex types
+    foreach my $regex_type ( @regex_types ) {
+        next if $matched_types{$regex_type->{type}};
+        $basename =~ m{([^$dir_sep_chars]*)$}o;
+        $matched_types{$regex_type->{type}} = 1 
+            if ( $basename =~ $regex_type->{regex} );
+    }
+
+    return (keys %matched_types,TEXT) if %matched_types;
 
     # At this point, we can't tell from just the name.  Now we have to
     # open it and look inside.
@@ -663,7 +687,10 @@ Returns a list of all the types that we can detect.
 =cut
 
 sub filetypes_supported {
-    return keys %mappings;
+    my %supported_filetypes = map { $_ => 1 } keys %mappings;
+    map { $supported_filetypes{$_->{type}} = 1 } @regex_types;
+
+    return keys %supported_filetypes;
 }
 
 sub _get_thpppt {
@@ -800,9 +827,16 @@ File inclusion/exclusion:
                         Files with the given EXTENSION(s) are recognized as
                         being of type TYPE. This replaces an existing
                         definition for type TYPE.
+  --type-set-regex TYPE=REGEX
+                        Files matching REGEX are recognized as being of
+                        type TYPE.  This replaces an existing definition
+                        for type TYPE.
   --type-add TYPE=.EXTENSION[,.EXT2[,...]]
                         Files with the given EXTENSION(s) are recognized as
                         being of (the existing) type TYPE
+  --type-add-regex TYPE=REGEX
+                        Files matching REGEX are recognized as being of (the 
+                        existing) type TYPE
 
   --[no]follow          Follow symlinks.  Default is off.
 
