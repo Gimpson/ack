@@ -13,14 +13,14 @@ App::Ack - A container for functions for the ack program
 
 =head1 VERSION
 
-Version 1.93_02
+Version 1.94
 
 =cut
 
 our $VERSION;
 our $COPYRIGHT;
 BEGIN {
-    $VERSION = '1.93_02';
+    $VERSION = '1.94';
     $COPYRIGHT = 'Copyright 2005-2010 Andy Lester.';
 }
 
@@ -124,7 +124,7 @@ BEGIN {
         vhdl        => [qw( vhd vhdl )],
         vim         => [qw( vim )],
         yaml        => [qw( yaml yml )],
-        xml         => [qw( xml dtd xslt ent )],
+        xml         => [qw( xml dtd xsl xslt ent )],
     );
 
     while ( my ($type,$exts) = each %mappings ) {

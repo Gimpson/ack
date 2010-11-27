@@ -12,7 +12,7 @@
 use warnings;
 use strict;
 
-our $VERSION = '1.93_02';
+our $VERSION = '1.94';
 # Check http://betterthangrep.com/ for updates
 
 # These are all our globals.
@@ -908,6 +908,7 @@ L<http://github.com/petdance/ack>
 How appropriate to have I<ack>nowledgements!
 
 Thanks to everyone who has contributed to ack in any way, including
+Scott Kyle,
 Nick Hooey,
 Bo Borgerson,
 Mark Szymanski,
@@ -1159,7 +1160,7 @@ use strict;
 our $VERSION;
 our $COPYRIGHT;
 BEGIN {
-    $VERSION = '1.93_02';
+    $VERSION = '1.94';
     $COPYRIGHT = 'Copyright 2005-2010 Andy Lester.';
 }
 
@@ -1262,7 +1263,7 @@ BEGIN {
         vhdl        => [qw( vhd vhdl )],
         vim         => [qw( vim )],
         yaml        => [qw( yaml yml )],
-        xml         => [qw( xml dtd xslt ent )],
+        xml         => [qw( xml dtd xsl xslt ent )],
     );
 
     while ( my ($type,$exts) = each %mappings ) {
