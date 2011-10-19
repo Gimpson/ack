@@ -66,6 +66,8 @@ my $skipped = [
     't/etc/core.2112',
     't/swamp/#emacs-workfile.pl#',
     't/swamp/options.pl.bak',
+    't/swamp/compressed.min.js',
+    't/swamp/compressed-min.js',
 ];
 
 my $perl_ruby = [ @{$perl}, @{$ruby} ];

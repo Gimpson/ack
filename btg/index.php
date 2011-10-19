@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta NAME="Author" Content="Andy Lester">
-        <title>ack -- better than grep, a power search tool for programmers</title>
+        <title>ack 1.96 -- better than grep, a source code search tool for programmers</title>
         <style type="text/css">
             <!--
             div.bill pre {
@@ -17,7 +17,7 @@
     </head>
     <body bgcolor="white">
         <div class="bill" align="center">
-            <table border="0" cellpadding="10" cellspacing="20">
+            <table border="0" cellpadding="10" cellspacing="10">
                 <tr>
                     <td>
 <pre>
@@ -31,12 +31,9 @@ _   /|
             </table>
         </div>
 
-        <?php include "ack-lists.php" ?>
-
-        <h2>Latest version of ack: 1.94, November 15, 2010</h2>
-        Read the <a href="Changes">Changelog</a>
 
         <p>
+        <?php include "ack-lists.php" ?>
         <b>ack</b> is a tool like <i>grep</i>, designed for programmers with large trees of
         heterogeneous source code.
         </p>
@@ -44,6 +41,12 @@ _   /|
         <p>
         ack is written purely in Perl, and takes advantage of the power of Perl's
         regular expressions.
+        </p>
+
+        <h2>Latest version of ack: 1.96, September 18, 2011</h2>
+
+        <p>
+        Read the <a href="Changes">Changelog</a>
         </p>
 
         <h2>How to install ack</h2>
@@ -68,27 +71,33 @@ _   /|
             </blockquote>
             </li>
             <li>Install the <b>Macport</b>: <a href="http://trac.macports.org/browser/trunk/dports/perl/p5-app-ack/Portfile">http://trac.macports.org/browser/trunk/dports/perl/p5-app-ack/Portfile</a></li>
+            <li>Install the <b>Debian package</b>: <a href="http://packages.debian.org/search?keywords=ack-grep">ack-grep</a>
+            <ul>
+                <li>To install ack-grep as "ack" instead of "ack-grep", use this command:<br>
+                <tt>  sudo dpkg-divert  --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep</tt></li>
+            </ul>
+            </li>
             <li>Install the <b>Ubuntu package</b>: ack-grep</li>
             <li>Install the <b>Fedora package</b>: ack</li>
             <li>Install the <b>Gentoo package</b>: sys-apps/ack</li>
             <li>Install the <b>Arch package</b>: community/ack</li>
         </ul>
 
-        <h2>Ack in Project for Textmate users</h2>
+        <h2>AckMate for Textmate users</h2>
         <p>
-        Users of TextMate, the programmer's editor for the Mac, can use the Ack in Project plugin by Trevor Squires:
+        Users of TextMate, the programmer's editor for the Mac, can use the AckMate plugin by Trevor Squires:
         </p>
         <blockquote>
-            TextMate users know just how slow its “Find in Project”
-            can be with large source trees. That’s why you need
-            "ack-in-project" – a TextMate bundle that uses
-            the super-speedy ‘ack’ tool to search your code
+            TextMate users know just how slow its "Find in Project"
+            can be with large source trees. That's why you need
+            "ack-in-project" &mdash; a TextMate bundle that uses
+            the super-speedy "ack" tool to search your code
             FAST. It gives you beautiful, clickable results just
             as fast as "ack" can find them. Check it out at:
-            <a href="http://github.com/protocool/ack-tmbundle/tree/master">http://github.com/protocool/ack-tmbundle/tree/master</a>
+            <a href="http://github.com/protocool/ackmate">http://github.com/protocool/ackmate</a>
         </blockquote>
 
-        <h2>Testimonials</h2>
+        <h2>Testimonials about ack</h2>
 
         <p>
         "Whoa, this is *so* much better than grep it's not even funny."
@@ -171,8 +180,8 @@ _   /|
         <h2>Top 10 reasons to use ack instead of grep.</h2>
         <ol>
             <li>It's <b>blazingly fast</b> because it only searches the stuff you want searched.</li>
-            <li>ack is pure Perl, so it <b>runs on Windows</b> just fine.</li>
-            <li>The <a href="http://ack.googlecode.com/svn/tags/latest/ack">standalone
+            <li>ack is pure Perl, so it <b>runs on Windows</b> just fine. It has <b>no dependencies</b> other than Perl 5.</li>
+            <li>The <a href="http://betterthangrep.com/ack-standalone">standalone
                 version</a> uses no non-standard modules, so you can put it in your
             <tt>~/bin</tt> without fear.</li>
             <li>
@@ -208,9 +217,9 @@ _   /|
             <tt>$ ack -f --perl &gt; all-perl-files</tt>
             <li><b>Color highlighting</b> of search results.
             <li>Uses <b>real Perl regular expressions</b>, not a GNU subset.
-            <li>Allows you to specify output using Perl's special variables
+            <li>Allows you to specify output using Perl's special variables.  To find all <tt>#include</tt> files in C programs:
             <ul>
-                <li>Example: <tt>ack '(Mr|Mr?s)\. (Smith|Jones)' --output='$&amp;'</tt>
+                <li><tt>ack --cc '#include\s+&lt;(.*)&gt;' --output '$1' -h</tt>
             </ul>
             <li>
             Many command-line switches are the same as in GNU grep:<br>

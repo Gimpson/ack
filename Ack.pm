@@ -20,8 +20,8 @@ Version 1.94
 our $VERSION;
 our $COPYRIGHT;
 BEGIN {
-    $VERSION = '1.94';
-    $COPYRIGHT = 'Copyright 2005-2010 Andy Lester.';
+    $VERSION = '1.96';
+    $COPYRIGHT = 'Copyright 2005-2011 Andy Lester.';
 }
 
 our $fh;
@@ -89,6 +89,7 @@ BEGIN {
         erlang      => [qw( erl hrl )],
         fortran     => [qw( f f77 f90 f95 f03 for ftn fpp )],
         go          => [qw( go )],
+        groovy      => [qw( groovy gtmpl gpp grunit )],
         haskell     => [qw( hs lhs )],
         hh          => [qw( h )],
         html        => [qw( htm html shtml xhtml )],
@@ -103,7 +104,7 @@ BEGIN {
         objcpp      => [qw( mm h )],
         ocaml       => [qw( ml mli )],
         parrot      => [qw( pir pasm pmc ops pod pg tg )],
-        perl        => [qw( pl pm pod t )],
+        perl        => [qw( pl pm pm6 pod t )],
         php         => [qw( php phpt php3 php4 php5 phtml)],
         plone       => [qw( pt cpt metadata cpy py )],
         python      => [qw( py )],
@@ -562,7 +563,7 @@ sub filetypes {
     close $fh;
 
     if ( $header =~ /^#!/ ) {
-        return ($1,TEXT)       if $header =~ /\b(ruby|p(?:erl|hp|ython))\b/;
+        return ($1,TEXT)       if $header =~ /\b(ruby|lua|p(?:erl|hp|ython))-?(\d[\d.]*)?\b/;
         return ('shell',TEXT)  if $header =~ /\b(?:ba|t?c|k|z)?sh\b/;
     }
     else {
@@ -582,6 +583,7 @@ Recognized files:
   /#.+#$/         - Emacs swap files
   /[._].*\.swp$/  - Vi(m) swap files
   /core\.\d+$/    - core dumps
+  /[.-]min\.js$/  - Minified javascript files
 
 Note that I<$filename> must be just a file, not a full path.
 
@@ -596,6 +598,7 @@ sub is_searchable {
     return if $filename =~ m{^#.*#$}o;
     return if $filename =~ m{^core\.\d+$}o;
     return if $filename =~ m{[._].*\.swp$}o;
+    return if $filename =~ /[.-]min\.js$/;
 
     return 1;
 }
@@ -844,10 +847,11 @@ File inclusion/exclusion:
     $ignore_dirs
 
   Files not checked for type:
-    /~\$/           - Unix backup files
-    /#.+#\$/        - Emacs swap files
+    /~\$/            - Unix backup files
+    /#.+#\$/         - Emacs swap files
     /[._].*\\.swp\$/ - Vi(m) swap files
-    /core\\.\\d+\$/   - core dumps
+    /core\\.\\d+\$/  - core dumps
+    /[.-]min\\.js\$/  - Minified javascript files
 
 Miscellaneous:
   --noenv               Ignore environment variables and ~/.ackrc
@@ -1655,7 +1659,7 @@ sub exit_from_ack {
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2010 Andy Lester.
+Copyright 2005-2011 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License v2.0.
